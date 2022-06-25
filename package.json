@@ -3,5 +3,22 @@
     "console.table": "^0.10.0",
     "inquirer": "^9.0.0",
     "mysql2": "^2.3.3"
-  }
+  },
+  "name": "week-12-challenge",
+  "description": "",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TanatswaS/week-12-challenge.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TanatswaS/week-12-challenge/issues"
+  },
+  "homepage": "https://github.com/TanatswaS/week-12-challenge#readme"
 }
