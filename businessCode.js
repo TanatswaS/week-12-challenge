@@ -1,6 +1,8 @@
 const connection = require('./config/connection');
 const inquirer = require('inquirer');
+
 //========== APP RUN PROMPT ==========//
+
 const runSearch = () => {
   inquirer
     .prompt({
@@ -29,18 +31,23 @@ const runSearch = () => {
         case 'View All Employees By Department':
           viewEmployeesByDepartment();
           break;
+
         case 'View All Departments':
           viewAllDepartments();
           break;
+
         case 'View All Employee Roles':
           viewAllRoles();
           break;
+
         case 'Add Employee':
           addEmployee();
           break;
+
         case 'Remove Employee':
           removeEmployee();
           break;
+
         case 'Update Employee Role':
           updateEmployeeRole();
           break;
@@ -52,16 +59,21 @@ const runSearch = () => {
         case 'Add Employee Role':
           addEmployeeRole();
           break;
+
         case 'Add Department':
           addDepartment();
           break;
+
         default:
           console.log(`Invalid action: ${answer.action}`);
           break;
       }
     });
 };
+
+
 //========== VIEW ALL EMPLOYEES ==========//
+
 const viewAllEmployees = () => {
   connection.query("SELECT employee.id, employee.first_name, employee.last_name, employee_role.title AS Title, department.name AS Department, employee_role.salary AS Salary, CONCAT(e.first_name, ' ' ,e.last_name) AS Manager FROM employee INNER JOIN employee_role on employee_role.id = employee.role_id INNER JOIN department on department.id = employee_role.department_id left join employee e on employee.manager_id = e.id;", (err, res) => {
     if (err) throw err
@@ -69,6 +81,8 @@ const viewAllEmployees = () => {
     runSearch();
   })
 }
+
+
 //========== VIEW ALL EMPLOYEES BY DEPARTMENT ==========//
 
 const viewEmployeesByDepartment = () => {
@@ -78,6 +92,8 @@ const viewEmployeesByDepartment = () => {
     runSearch();
   })
 }
+
+
 //========== VIEW ALL DEPARTMENTS ==========//
 
 const viewAllDepartments = () => {
@@ -87,6 +103,8 @@ const viewAllDepartments = () => {
     runSearch();
   })
 }
+
+
 //========== VIEW ALL EMPLOYEES BY ROLE ==========//
 
 const viewAllRoles = () => {
@@ -96,7 +114,10 @@ const viewAllRoles = () => {
     runSearch();
   })
 }
+
+
 //========== ADD EMPLOYEE ==========//
+
 function addEmployee() {
   connection.query("SELECT * FROM employee_role", function (err, results) {
     if (err) throw err;
@@ -132,7 +153,7 @@ function addEmployee() {
               {
                 name: 'manager_id',
                 type: 'list',
-                message: 'Select the Manager for this employee.',
+                message: 'Select the manager for this employee.',
                 choices: results.map((item) => item.first_name),
               },
             ])
@@ -165,7 +186,9 @@ function addEmployee() {
       });
   });
 }
+
 // //========== REMOVE EMPLOYEE ==========//
+
 function removeEmployee() {
   connection.query("SELECT * FROM employee", function (err, res) {
     if (err) throw err;
@@ -191,6 +214,7 @@ function removeEmployee() {
     });
   })
 };
+
 // //========== UPDATE EMPLOYEE ROLE ==========//
 const updateEmployeeRole = () => {
   connection.query('SELECT * FROM employee', function (err, results){
@@ -235,12 +259,11 @@ const updateEmployeeRole = () => {
 }
 
 
+
 //========== UPDATE EMPLOYEE MANAGER ==========//
 // const updateEmployeeManager = () => {
-
+    
 // }
-
-// runSearch();
 
 
 // //============= ADD EMPLOYEE ROLE ==========================//
@@ -293,7 +316,7 @@ function addDepartment() {
             "INSERT INTO department SET ? ",
             {
               name: res.name
-
+            
             },
             function(err) {
                 if (err) throw err
@@ -304,5 +327,5 @@ function addDepartment() {
         )
     })
   }
-  
+
   runSearch();
