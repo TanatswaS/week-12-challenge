@@ -15,7 +15,7 @@ const runSearch = () => {
         'Add Employee',
         'Remove Employee',
         'Update Employee Role',
-        'Update Employee Manager',
+        // 'Update Employee Manager',
         'Add Employee Role',
         'Add Department'
       ],
@@ -44,18 +44,17 @@ const runSearch = () => {
         case 'Update Employee Role':
           updateEmployeeRole();
           break;
-        case 'Update Employee Manager':
-          updateEmployeeManager();
-          break;
+
+        // case 'Update Employee Manager':
+        //   updateEmployeeManager();
+        //   break;
 
         case 'Add Employee Role':
           addEmployeeRole();
           break;
-
         case 'Add Department':
           addDepartment();
           break;
-
         default:
           console.log(`Invalid action: ${answer.action}`);
           break;
@@ -63,7 +62,6 @@ const runSearch = () => {
     });
 };
 //========== VIEW ALL EMPLOYEES ==========//
-
 const viewAllEmployees = () => {
   connection.query("SELECT employee.id, employee.first_name, employee.last_name, employee_role.title AS Title, department.name AS Department, employee_role.salary AS Salary, CONCAT(e.first_name, ' ' ,e.last_name) AS Manager FROM employee INNER JOIN employee_role on employee_role.id = employee.role_id INNER JOIN department on department.id = employee_role.department_id left join employee e on employee.manager_id = e.id;", (err, res) => {
     if (err) throw err
@@ -72,16 +70,18 @@ const viewAllEmployees = () => {
   })
 }
 //========== VIEW ALL EMPLOYEES BY DEPARTMENT ==========//
+
 const viewEmployeesByDepartment = () => {
-  connection.query('SELECT employee.first_name, employee.last_name, department.name AS Department FROM employee JOIN employee_role ON employee.role_id = employee_role.id JOIN department ON employee_role.department_id = department.id ORDER BY employee.id;', (err, res) => {
+  connection.query("SELECT employee.first_name, employee.last_name, department.name AS Department FROM employee JOIN employee_role ON employee.role_id = employee_role.id JOIN department ON employee_role.department_id = department.id ORDER BY employee.id;", (err, res) => {
     if (err) throw err
     console.table(res);
     runSearch();
   })
 }
 //========== VIEW ALL DEPARTMENTS ==========//
+
 const viewAllDepartments = () => {
-  connection.query('SELECT name AS Departments FROM department', (err, res) => {
+  connection.query("SELECT name AS Departments FROM department", (err, res) => {
     if (err) throw err
     console.table(res);
     runSearch();
@@ -90,7 +90,7 @@ const viewAllDepartments = () => {
 //========== VIEW ALL EMPLOYEES BY ROLE ==========//
 
 const viewAllRoles = () => {
-  connection.query('SELECT title AS Title, salary AS Salary FROM employee_role', (err, res) => {
+  connection.query("SELECT title AS Title, salary AS Salary FROM employee_role", (err, res) => {
     if (err) throw err
     console.table(res);
     runSearch();
@@ -103,19 +103,19 @@ function addEmployee() {
     inquirer
       .prompt([
         {
-          name: `employeeAdd`,
-          type: `input`,
-          message: `Enter the first name of the employee you would like to add.`,
+          name: 'employeeAdd',
+          type: 'input',
+          message: 'Enter the first name of the employee you would like to add.',
         },
         {
-          name: `last_name`,
-          type: `input`,
-          message: `Enter the last name of the employee you would like to add.`,
+          name: 'last_name',
+          type: 'input',
+          message: 'Enter the last name of the employee you would like to add.',
         },
         {
-          name: `role_id`,
-          type: `list`,
-          message: `Select the role of this employee.`,
+          name: 'role_id',
+          type: 'list',
+          message: 'Select the role of this employee.',
           choices: results.map((item) => item.title),
         },
       ])
@@ -130,9 +130,9 @@ function addEmployee() {
           inquirer
             .prompt([
               {
-                name: `manager_id`,
-                type: `list`,
-                message: `Select the Manager for this employee.`,
+                name: 'manager_id',
+                type: 'list',
+                message: 'Select the Manager for this employee.',
                 choices: results.map((item) => item.first_name),
               },
             ])
@@ -191,15 +191,14 @@ function removeEmployee() {
     });
   })
 };
-
 // //========== UPDATE EMPLOYEE ROLE ==========//
 const updateEmployeeRole = () => {
   connection.query('SELECT * FROM employee', function (err, results){
     if (err) throw err;
     inquirer
     .prompt([{
-        name: `employeeUpdate`,
-        type: `list`,
+        name: 'employeeUpdate',
+        type: 'list',
         message: "Choose the employee whose role you would like to update.",
         choices: results.map(employee => employee.first_name)
         },
@@ -236,12 +235,12 @@ const updateEmployeeRole = () => {
 }
 
 
-
 //========== UPDATE EMPLOYEE MANAGER ==========//
-const updateEmployeeManager = () => {
-    
-}
-runSearch();
+// const updateEmployeeManager = () => {
+
+// }
+
+// runSearch();
 
 
 // //============= ADD EMPLOYEE ROLE ==========================//
@@ -271,6 +270,7 @@ function addEmployeeRole() {
             },
             function (err) {
               if (err) throw err;
+              console.log("Successfully added an employee role!")
               console.table(res);
               runSearch();
             }
@@ -281,25 +281,26 @@ function addEmployeeRole() {
 }
 
 // //============= ADD DEPARTMENT ==========================//
-// function addDepartment() { 
-//     inquirer.prompt([
-//         {
-//           name: "name",
-//           type: "input",
-//           message: "What department would you like to add?"
-//         }
-//     ]).then(function(res) {
-//         var query = connection.query(
-//             "INSERT INTO department SET ? ",
-//             {
-//               name: res.name
-            
-//             },
-//             function(err) {
-//                 if (err) throw err
-//                 console.table(res);
-//                 startPrompt();
-//             }
-//         )
-//     })
-//   }
+function addDepartment() { 
+    inquirer.prompt([
+        {
+          name: "name",
+          type: "input",
+          message: "What department would you like to add?"
+        }
+    ]).then(function(res) {
+        var query = connection.query(
+            "INSERT INTO department SET ? ",
+            {
+              name: res.name
+
+            },
+            function(err) {
+                if (err) throw err
+                console.log("Successfully added a department!");
+                console.table(res);
+                runSearch();
+            }
+        )
+    })
+  }
