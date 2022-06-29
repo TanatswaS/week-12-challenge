@@ -15,7 +15,9 @@ const runSearch = () => {
         'Add Employee',
         'Remove Employee',
         'Update Employee Role',
-        'Update Employee Manager'
+        'Update Employee Manager',
+        'Add Employee Role',
+        'Add Department'
       ],
     })
     .then((answer) => {
@@ -27,15 +29,12 @@ const runSearch = () => {
         case 'View All Employees By Department':
           viewEmployeesByDepartment();
           break;
-
         case 'View All Departments':
           viewAllDepartments();
           break;
-
         case 'View All Employee Roles':
           viewAllRoles();
           break;
-
         case 'Add Employee':
           addEmployee();
           break;
@@ -48,27 +47,31 @@ const runSearch = () => {
         case 'Update Employee Manager':
           updateEmployeeManager();
           break;
+
+        case 'Add Employee Role':
+          addEmployeeRole();
+          break;
+
+        case 'Add Department':
+          addDepartment();
+          break;
+
         default:
           console.log(`Invalid action: ${answer.action}`);
           break;
       }
     });
 };
-
-
 //========== VIEW ALL EMPLOYEES ==========//
 
 const viewAllEmployees = () => {
-  connection.query("SELECT employee.id, employee.first_name, employee.last_name, employee_role.title, department.name AS Department, employee_role.salary, CONCAT(e.first_name, ' ' ,e.last_name) AS Manager FROM employee INNER JOIN employee_role on employee_role.id = employee.role_id INNER JOIN department on department.id = employee_role.department_id left join employee e on employee.manager_id = e.id;", (err, res) => {
+  connection.query("SELECT employee.id, employee.first_name, employee.last_name, employee_role.title AS Title, department.name AS Department, employee_role.salary AS Salary, CONCAT(e.first_name, ' ' ,e.last_name) AS Manager FROM employee INNER JOIN employee_role on employee_role.id = employee.role_id INNER JOIN department on department.id = employee_role.department_id left join employee e on employee.manager_id = e.id;", (err, res) => {
     if (err) throw err
     console.table(res);
     runSearch();
   })
 }
-
-
 //========== VIEW ALL EMPLOYEES BY DEPARTMENT ==========//
-
 const viewEmployeesByDepartment = () => {
   connection.query('SELECT employee.first_name, employee.last_name, department.name AS Department FROM employee JOIN employee_role ON employee.role_id = employee_role.id JOIN department ON employee_role.department_id = department.id ORDER BY employee.id;', (err, res) => {
     if (err) throw err
@@ -76,10 +79,7 @@ const viewEmployeesByDepartment = () => {
     runSearch();
   })
 }
-
-
 //========== VIEW ALL DEPARTMENTS ==========//
-
 const viewAllDepartments = () => {
   connection.query('SELECT name AS Departments FROM department', (err, res) => {
     if (err) throw err
@@ -87,21 +87,16 @@ const viewAllDepartments = () => {
     runSearch();
   })
 }
-
-
 //========== VIEW ALL EMPLOYEES BY ROLE ==========//
 
 const viewAllRoles = () => {
-  connection.query('SELECT title, salary FROM employee_role', (err, res) => {
+  connection.query('SELECT title AS Title, salary AS Salary FROM employee_role', (err, res) => {
     if (err) throw err
     console.table(res);
     runSearch();
   })
 }
-
-
 //========== ADD EMPLOYEE ==========//
-
 function addEmployee() {
   connection.query("SELECT * FROM employee_role", function (err, results) {
     if (err) throw err;
@@ -170,8 +165,6 @@ function addEmployee() {
       });
   });
 }
-
-
 // //========== REMOVE EMPLOYEE ==========//
 function removeEmployee() {
   connection.query("SELECT * FROM employee", function (err, res) {
@@ -199,8 +192,7 @@ function removeEmployee() {
   })
 };
 
-
-//========== UPDATE EMPLOYEE ROLE ==========//
+// //========== UPDATE EMPLOYEE ROLE ==========//
 const updateEmployeeRole = () => {
   connection.query('SELECT * FROM employee', function (err, results){
     if (err) throw err;
@@ -247,48 +239,49 @@ const updateEmployeeRole = () => {
 
 //========== UPDATE EMPLOYEE MANAGER ==========//
 const updateEmployeeManager = () => {
-
+    
 }
-
 runSearch();
 
 
 // //============= ADD EMPLOYEE ROLE ==========================//
-// function addRole() { 
-//   connection.query("SELECT role.title AS Title, role.salary AS Salary FROM role",   function(err, res) {
-//     inquirer.prompt([
-//         {
-//           name: "Title",
-//           type: "input",
-//           message: "What is the title of the role?"
-//         },
-//         {
-//           name: "Salary",
-//           type: "input",
-//           message: "What is the salary of the role?"
-
-//         } 
-//     ]).then(function(res) {
-//         connection.query(
-//             "INSERT INTO role SET ?",
-//             {
-//               title: res.Title,
-//               salary: res.Salary,
-//             },
-//             function(err) {
-//                 if (err) throw err
-//                 console.table(res);
-//                 startPrompt();
-//             }
-//         )
-
-//     });
-//   });
-//   }
+function addEmployeeRole() {
+  connection.query(
+    "SELECT employee_role.title AS Title, employee_role.salary AS Salary FROM employee_role",
+    function (err, res) {
+      inquirer
+        .prompt([
+          {
+            name: "Title",
+            type: "input",
+            message: "What is the title of the role?",
+          },
+          {
+            name: "Salary",
+            type: "input",
+            message: "What is the salary of the role?",
+          },
+        ])
+        .then(function (res) {
+          connection.query(
+            "INSERT INTO employee_role SET ?",
+            {
+              title: res.Title,
+              salary: res.Salary,
+            },
+            function (err) {
+              if (err) throw err;
+              console.table(res);
+              runSearch();
+            }
+          );
+        });
+    }
+  );
+}
 
 // //============= ADD DEPARTMENT ==========================//
 // function addDepartment() { 
-
 //     inquirer.prompt([
 //         {
 //           name: "name",
@@ -300,7 +293,7 @@ runSearch();
 //             "INSERT INTO department SET ? ",
 //             {
 //               name: res.name
-
+            
 //             },
 //             function(err) {
 //                 if (err) throw err
